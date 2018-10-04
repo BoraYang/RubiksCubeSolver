@@ -19,7 +19,7 @@ if __name__ == "__main__":
     frame.pack(fill=BOTH,expand=1)
 
     #adding the image
-    File = "green.jpg"
+    File = "mixedcolors.jpg"
     img = ImageTk.PhotoImage(Image.open(File))
     canvas.create_image(0,0,image=img,anchor="nw")
     canvas.config(scrollregion=canvas.bbox(ALL))
