@@ -1,40 +1,58 @@
 import cv2
 import numpy as np
+import math
 
-image = cv2.imread("mixedccolors.jpg")
+image = cv2.imread("mixedcolors.jpg")
 
-#for i in range(480):
- #   print('='*40)
-  #  for j in range(640):
-   #     print(image[i][j])
-        #b,g,r = image[i][j] #Images broken into blue, green, red channels
+def get_average(colorValues):
+	blue = 0
+	green = 0
+	red = 0
+	listAvgTotalCount = len(colorValues)
 
-print("Orange values\n")
-print(image[149][404])
-print(image[154][379])
-print(image[156][402])
-print(image[158][428])
-print(image[165][405])
+	for bgr in colorValues:
+		blue+=bgr[0]**2
+		green+=bgr[1]**2
+		red+=bgr[2]**2
 
-print("Red values\n")
-print(image[190][399])
-print(image[204][355])
-print(image[202][395])
-print(image[208][433])
-print(image[221][387])
+	return [int(math.sqrt(blue/listAvgTotalCount)),int(math.sqrt(green/listAvgTotalCount)),int(math.sqrt(red/listAvgTotalCount))]
 
-print("White values\n")
-print(image[257][411])
-print(image[246][456])
-print(image[306][408])
-print(image[278][431])
-print(image[297][447])
+print("Orange value average")
+orangevals = []
+orangevals.append(image[149][404])
+orangevals.append(image[154][379])
+orangevals.append(image[156][402])
+orangevals.append(image[158][428])
+orangevals.append(image[165][405])
+print(get_average(orangevals))
+print()
 
-print("Yellow values\n")
-print(image[322][479])
-print(image[306][507])
-print(image[358][472])
-print(image[336][489])
-print(image[350][501])    
+print("Red value average")
+redvals = []
+redvals.append(image[190][399])
+redvals.append(image[204][355])
+redvals.append(image[202][395])
+redvals.append(image[208][433])
+redvals.append(image[221][387])
+print(get_average(redvals))
+print()
 
+print("White value average")
+whitevals = []
+whitevals.append(image[257][411])
+whitevals.append(image[246][456])
+whitevals.append(image[306][408])
+whitevals.append(image[278][431])
+whitevals.append(image[297][447])
+print(get_average(whitevals))
+print()
 
+print("Yellow value average")
+yellowvals = []
+yellowvals.append(image[322][479])
+yellowvals.append(image[306][507])
+yellowvals.append(image[358][472])
+yellowvals.append(image[336][489])
+yellowvals.append(image[350][501])
+print(get_average(yellowvals))
+print()
