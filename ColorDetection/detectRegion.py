@@ -37,8 +37,12 @@ def blobDetection(inputImage):
        cv2.imshow("Image", inputImage)
        cv2.waitKey(0)
 
-bgr_image = cv2.imread("closeBottom.jpg")
-#bgr_image = bgr_image[0:280,120:470]
+bgr_image = cv2.imread("closeTop.jpg")[0:280,120:470]
+quick_mask = cv2.imread("closeTopMask.jpg", cv2.IMREAD_GRAYSCALE)[0:280,120:470]
+thresh, im_bw = cv2.threshold(quick_mask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
+pre_mask = cv2.bitwise_and(bgr_image,bgr_image,mask=im_bw)
+#pre_mask = pre_mask[0:280,120:470]
 
 cv2.medianBlur(bgr_image,5)
 
@@ -64,9 +68,9 @@ mask_list.append(mask_red)
 mask_orange = cv2.inRange(hsv_image,(5,100,200),(25,199,255))
 mask_list.append(mask_orange)
 
-# for mask in mask_list:
-#     target = cv2.bitwise_and(bgr_image,bgr_image,mask=mask)
-#     blobDetection(target)
+for mask in mask_list:
+    target = cv2.bitwise_and(pre_mask,pre_mask,mask=mask)
+    blobDetection(target)
     # cv2.imshow('image',target)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
@@ -75,10 +79,10 @@ combined_masks = mask_yellow + mask_white + mask_blue + mask_green + mask_red + 
 
 #mask_red_and_orange = cv2.bitwise_or(mask_red,mask_orange)
 
-target = cv2.bitwise_and(bgr_image,bgr_image,mask=combined_masks)
+target = cv2.bitwise_and(pre_mask,pre_mask,mask=combined_masks)
 
 #cv2.imwrite("closeTop2.jpg",target)
-cv2.imshow('image',bgr_image)
+cv2.imshow('image',target)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
