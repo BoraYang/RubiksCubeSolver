@@ -7,7 +7,7 @@ def blobDetection(inputImage):
 
     gray_image = cv2.cvtColor(inputImage, cv2.COLOR_BGR2GRAY)
 
-    ret,thresh = cv2.threshold(gray_image,115,255,0)
+    ret,thresh = cv2.threshold(gray_image,40,255,0)
 
     _, contours, _ = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
@@ -25,14 +25,14 @@ def blobDetection(inputImage):
         cX = int(M["m10"] / M["m00"])
         cY = int(M["m01"] / M["m00"])
 
-       #cv2.circle(inputImage, (cX, cY), 5, (255, 255, 255), -1)
+       cv2.circle(inputImage, (cX, cY), 5, (255, 255, 255), -1)
 
-        (x,y,w,h) = cv2.boundingRect(c)
-        if w > 40 or h > 30:
-            print(f"{x},{y}")
-            cv2.rectangle(inputImage, (x,y), (x+w,y+h), (0,255,0), 2)
-        else:
-            continue
+        # (x,y,w,h) = cv2.boundingRect(c)
+        # if w > 40 or h > 30:
+        #     print(f"{x},{y}")
+        #     cv2.rectangle(inputImage, (x,y), (x+w,y+h), (0,255,0), 2)
+        # else:
+        #     continue
      
        cv2.imshow("Image", inputImage)
        cv2.waitKey(0)
