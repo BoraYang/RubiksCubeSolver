@@ -38,23 +38,12 @@ def blobDetection(inputImage):
       cv2.imshow("Image", inputImage)
       cv2.waitKey(0)
 
-
-
 def maskImagePreprocess(inputImage,mask):
 
   _, im_bw = cv2.threshold(quick_mask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
   mask_apply = cv2.bitwise_and(bgr_image,bgr_image,mask=quick_mask)
 
   return mask_apply
-
-
-def claheEqualization(inputImage):
-
-  clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-  cl1 = clahe.apply(inputImage)
-
-  return cl1
-
 
 bgr_image = cv2.imread("closeTop.jpg") #[0:280,120:470]
 
