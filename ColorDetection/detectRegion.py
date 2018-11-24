@@ -38,6 +38,8 @@ def blobDetection(inputImage):
        cv2.waitKey(0)
 
 bgr_image = cv2.imread("closeTop.jpg")[0:280,120:470]
+norm_image = cv2.normalize(bgr_image, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+
 quick_mask = cv2.imread("closeTopMask.jpg", cv2.IMREAD_GRAYSCALE)[0:280,120:470]
 thresh, im_bw = cv2.threshold(quick_mask, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
@@ -82,7 +84,8 @@ combined_masks = mask_yellow + mask_white + mask_blue + mask_green + mask_red + 
 target = cv2.bitwise_and(pre_mask,pre_mask,mask=combined_masks)
 
 #cv2.imwrite("closeTop2.jpg",target)
-cv2.imshow('image',target)
+cv2.imshow('normalized',norm_image)
+cv2.imshow('image',bgr_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
