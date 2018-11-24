@@ -8,7 +8,6 @@ def get_average(colorValues):
   green = 0
   red = 0
   listAvgTotalCount = len(colorValues)
-
   for bgr in colorValues:
     blue+=bgr[0]**2
     green+=bgr[1]**2
