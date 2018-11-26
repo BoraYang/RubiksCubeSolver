@@ -11,7 +11,7 @@ using namespace std;
 
 //Function declarations
 int getNonZero(Mat input_array, Mat gray_arr);
-void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, int position);
+string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string, int position);
 vector<Mat> getColorRanges(vector<Mat> color_list, Mat hsv_image);
 
 int main( int argc, char** argv ){
@@ -27,7 +27,7 @@ int main( int argc, char** argv ){
 	vector<Mat> color_mask_list;
 	color_mask_list = getColorRanges(color_mask_list,hsv_image);
 
-	String colorString = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
+	string colorString = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
 	int i=0;
 
@@ -43,7 +43,6 @@ int main( int argc, char** argv ){
 		//Create string for each mask image to open
 		String cube_mask;
 		cube_mask = "mask" + to_string(i) + ".jpg";
-		cout << cube_mask << '\n';
 
 		//Reading in the cube square mask in black and white mode
 		Mat bw_square;
@@ -63,9 +62,11 @@ int main( int argc, char** argv ){
 		// imshow("Cube Square", cube_square);
 		// waitKey(0);
 
-		getCubeColor(cube_square, color_mask_list, colorString, i);
+		colorString = getCubeColor(cube_square, color_mask_list, colorString, i-1);
 
 	}
+
+	cout << colorString << '\n';
 
 	imshow("Image", bgr_image);
 
@@ -92,7 +93,7 @@ int getNonZero(Mat input_array, Mat gray_arr){
 
 }
 
-void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, int position){
+string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string, int position){
 
 	//Yellow: 0, White: 1, Blue: 2, Green: 3, Red: 4, Orange: 5
   //Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
@@ -117,37 +118,36 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, i
 
 	if (ycount > 100){
 
-		cube_string[position-1] = 'U';
+		cube_string.replace(position,1,"U");
 
 	}
 	if (wcount > 200){
 
-		cube_string[position-1] = 'D';
+		cube_string.replace(position,1,"D");
 
 	}	
 	if (bcount > 200){
 
-		cube_string[position-1] = 'L';
+		cube_string.replace(position,1,"L");
 
 	}
 	if (gcount > 200){
 
-		cube_string[position-1] = 'R';
+		cube_string.replace(position,1,"R");
 
 	}
 	if (rcount > 200){
 
-		cube_string[position-1] = 'F';
+		cube_string.replace(position,1,"F");
 
 	}
 	if (ocount > 200){
 
-		cube_string[position-1] = 'B';
+		cube_string.replace(position,1,"B");
 
-	}	
+	}
 
-	imshow("Yellow", yellow);
-	waitKey(0);
+	return cube_string;
 
 }
 
