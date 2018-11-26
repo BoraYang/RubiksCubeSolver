@@ -10,9 +10,9 @@ using namespace cv;
 using namespace std;
 
 //Function declarations
-Mat maskImagePreprocess(Mat inputImage, Mat mask);
+int countNonZero(Mat input_array);
 void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, int position);
-void getColorRanges(vector<Mat> color_list, Mat hsv_image);
+vector<Mat> getColorRanges(vector<Mat> color_list, Mat hsv_image);
 
 int main( int argc, char** argv ){
 
@@ -25,7 +25,7 @@ int main( int argc, char** argv ){
 	cvtColor(bgr_image,hsv_image,CV_BGR2HSV);
 
 	vector<Mat> color_mask_list;
-	getColorRanges(color_mask_list,hsv_image);
+	color_mask_list = getColorRanges(color_mask_list,hsv_image);
 
 	String colorString = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
@@ -79,9 +79,40 @@ int main( int argc, char** argv ){
 
 }
 
+int countNonZero(Mat input_array){
+
+	int retVal;
+
+	Mat tempArr;
+	for (int i = 0; i < tempArr.cols; i++ ) {
+        for (int j = 0; j < tempArr.rows; j++) {
+            if (tempArr.at<uchar>(j, i) > 0) {  
+                retVal++;
+            }
+        }
+    }
+	cout << retVal << '\n';
+
+	return retVal;
+
+}
+
 void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, int position){
 
+	//Yellow: 0, White: 1, Blue: 2, Green: 3, Red: 4, Orange: 5
+  //Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
 
+	Mat yellow; Mat white; Mat blue; Mat green; Mat red; Mat orange;
+	int ycount; int wcount;int bcount; int gcount; int rcount; int ocount;
+
+	bitwise_and(cube_square,cube_square,yellow, color_list.at(0));
+	bitwise_and(cube_square,cube_square,white, color_list.at(1));
+	bitwise_and(cube_square,cube_square,blue, color_list.at(2));
+	bitwise_and(cube_square,cube_square,green, color_list.at(3));
+	bitwise_and(cube_square,cube_square,red, color_list.at(4));
+	bitwise_and(cube_square,cube_square,orange, color_list.at(5));
+
+	ycount = countNonZero(yellow);
 
 }
 
@@ -91,14 +122,9 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, i
 	used to find the color of each cube square mask with a bitwise_and
 	computation.
 */
-void getColorRanges(vector<Mat> color_list, Mat hsv_image){
+vector<Mat> getColorRanges(vector<Mat> masks, Mat hsv_image){
 
-	Mat mask_yellow;
-	Mat mask_white;
-	Mat mask_blue;
-	Mat mask_green;
-	Mat mask_red;
-	Mat mask_orange;
+	Mat mask_yellow; Mat mask_white; Mat mask_blue; Mat mask_green; Mat mask_red; Mat mask_orange;
 
 	inRange(hsv_image,Scalar(26,60,130),Scalar(36,140,190),mask_yellow);
 	inRange(hsv_image,Scalar(0,0,160),Scalar(255,50,255),mask_white);
@@ -107,11 +133,13 @@ void getColorRanges(vector<Mat> color_list, Mat hsv_image){
 	inRange(hsv_image,Scalar(0,170,100),Scalar(10,255,160),mask_red);
 	inRange(hsv_image,Scalar(5,100,200),Scalar(25,199,255),mask_orange);
 
-	color_list.push_back(mask_yellow);
-	color_list.push_back(mask_white);
-	color_list.push_back(mask_blue);
-	color_list.push_back(mask_green);
-	color_list.push_back(mask_red);
-	color_list.push_back(mask_orange);
+	masks.push_back(mask_yellow);
+	masks.push_back(mask_white);
+	masks.push_back(mask_blue);
+	masks.push_back(mask_green);
+	masks.push_back(mask_red);
+	masks.push_back(mask_orange);
+
+	return masks;
 
 }
