@@ -60,7 +60,10 @@ int main( int argc, char** argv ){
 		Mat cube_square;
 		bitwise_and(bgr_image,bgr_image,cube_square,img_bw);
 
-		getCubeColor(cube_square, color_mask_list, colorString, i);
+		imshow("Cube Square", cube_square);
+		waitKey(0);
+
+		//getCubeColor(cube_square, color_mask_list, colorString, i);
 
 	}
 
