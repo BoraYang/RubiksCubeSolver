@@ -28,19 +28,19 @@ def getColorRanges(color_list):
   mask_orange = cv2.inRange(hsv_image,(5,100,200),(25,199,255))
   color_mask_list.append(mask_orange)
 
-def getCubeColor(cube_sqaure, color_array, cube_string, position):
+def getCubeColor(cube_square, color_array, cube_string, position):
   #Position needs to be decremented by 1 to match cube_string index. Or change "mask.jpg" to start from 0.
 
   #Yellow: 0, White: 1, Blue: 2, Green: 3, Red: 4, Orange: 5
   #Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
 
   #Determine if cube square is of a certain color. If it is a certain color, the value stored in the variable will be greater than zero.
-  yellow = np.count_nonzero(cv2.bitwise_and(cube_sqaure,cube_sqaure,mask=color_array[0]))
-  white = np.count_nonzero(cv2.bitwise_and(cube_sqaure,cube_sqaure,mask=color_array[1]))
-  blue = np.count_nonzero(cv2.bitwise_and(cube_sqaure,cube_sqaure,mask=color_array[2]))
-  green = np.count_nonzero(cv2.bitwise_and(cube_sqaure,cube_sqaure,mask=color_array[3]))
-  red = np.count_nonzero(cv2.bitwise_and(cube_sqaure,cube_sqaure,mask=color_array[4]))
-  orange = np.count_nonzero(cv2.bitwise_and(cube_sqaure,cube_sqaure,mask=color_array[5]))
+  yellow = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[0]))
+  white = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[1]))
+  blue = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[2]))
+  green = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[3]))
+  red = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[4]))
+  orange = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[5]))
 
   #print(f"Y:{yellow},W:{white},B:{blue},G:{green},R:{red},O:{orange}")
 
@@ -71,9 +71,6 @@ def maskImagePreprocess(inputImage,mask):
   return mask_apply
 
 bgr_image = cv2.imread("closeTop.jpg") #[0:280,120:470]
-
-mask_image = cv2.imread("closeTopMask.jpg", 0) #[0:280,120:470]
-mask_image = maskImagePreprocess(bgr_image,mask_image)
 
 cv2.medianBlur(bgr_image,3)
 
