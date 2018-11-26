@@ -10,7 +10,7 @@ using namespace cv;
 using namespace std;
 
 //Function declarations
-int countNonZero(Mat input_array);
+int getNonZero(Mat input_array, Mat gray_arr);
 void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, int position);
 vector<Mat> getColorRanges(vector<Mat> color_list, Mat hsv_image);
 
@@ -60,10 +60,10 @@ int main( int argc, char** argv ){
 		Mat cube_square;
 		bitwise_and(bgr_image,bgr_image,cube_square,img_bw);
 
-		imshow("Cube Square", cube_square);
-		waitKey(0);
+		// imshow("Cube Square", cube_square);
+		// waitKey(0);
 
-		//getCubeColor(cube_square, color_mask_list, colorString, i);
+		getCubeColor(cube_square, color_mask_list, colorString, i);
 
 	}
 
@@ -79,19 +79,14 @@ int main( int argc, char** argv ){
 
 }
 
-int countNonZero(Mat input_array){
+int getNonZero(Mat input_array, Mat gray_arr){
 
 	int retVal;
 
+	cvtColor(input_array, gray_arr, CV_BGR2GRAY);
+
 	Mat tempArr;
-	for (int i = 0; i < tempArr.cols; i++ ) {
-        for (int j = 0; j < tempArr.rows; j++) {
-            if (tempArr.at<uchar>(j, i) > 0) {  
-                retVal++;
-            }
-        }
-    }
-	cout << retVal << '\n';
+	retVal = countNonZero(gray_arr);
 
 	return retVal;
 
@@ -103,6 +98,7 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, i
   //Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
 
 	Mat yellow; Mat white; Mat blue; Mat green; Mat red; Mat orange;
+	Mat gY; Mat gW; Mat gB; Mat gG; Mat gR; Mat gO;
 	int ycount; int wcount;int bcount; int gcount; int rcount; int ocount;
 
 	bitwise_and(cube_square,cube_square,yellow, color_list.at(0));
@@ -112,7 +108,46 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, String cube_string, i
 	bitwise_and(cube_square,cube_square,red, color_list.at(4));
 	bitwise_and(cube_square,cube_square,orange, color_list.at(5));
 
-	ycount = countNonZero(yellow);
+	ycount = getNonZero(yellow, gY);
+	wcount = getNonZero(white, gW);
+	bcount = getNonZero(blue, gB);
+	gcount = getNonZero(green, gG);
+	rcount = getNonZero(red, gR);
+	ocount = getNonZero(orange, gO);
+
+	if (ycount > 100){
+
+		cube_string[position-1] = 'U';
+
+	}
+	if (wcount > 200){
+
+		cube_string[position-1] = 'D';
+
+	}	
+	if (bcount > 200){
+
+		cube_string[position-1] = 'L';
+
+	}
+	if (gcount > 200){
+
+		cube_string[position-1] = 'R';
+
+	}
+	if (rcount > 200){
+
+		cube_string[position-1] = 'F';
+
+	}
+	if (ocount > 200){
+
+		cube_string[position-1] = 'B';
+
+	}	
+
+	imshow("Yellow", yellow);
+	waitKey(0);
 
 }
 

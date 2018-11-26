@@ -42,7 +42,7 @@ def getCubeColor(cube_square, color_array, cube_string, position):
   red = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[4]))
   orange = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[5]))
 
-  #print(f"Y:{yellow},W:{white},B:{blue},G:{green},R:{red},O:{orange}")
+  print(f"Y:{yellow},W:{white},B:{blue},G:{green},R:{red},O:{orange}")
 
   if yellow > 100:
     cube_string[position-1] = 'U'
