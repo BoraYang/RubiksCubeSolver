@@ -106,7 +106,7 @@ for i in range(1,18):
   getCubeColor(cube_square,color_mask_list,colorString,i)
 
   #Assign this function call to a 'square_color' variable that will assign a color to each position in the output string
-  getCenterOfCube(hsv_image,cube_square)
+  #getCenterOfCube(hsv_image,cube_square)
 
 finalCubeString = "".join(colorString)
 print(finalCubeString)
