@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 using namespace cv;
 using namespace std;
@@ -16,29 +17,40 @@ vector<Mat> getColorRanges(vector<Mat> color_list, Mat hsv_image);
 
 int main( int argc, char** argv ){
 
-	Mat bgr_image;
-	bgr_image = imread("closeTop.jpg", 1);
+	Mat bgr_image_ct; bgr_image_ct = imread("closeTop.jpg", 1);
+	Mat bgr_image_cb; bgr_image_cb = imread("closeBottom.jpg", 1);
+	Mat bgr_image_ft; bgr_image_ft = imread("farTop.jpg", 1);
+	Mat bgr_image_fb; bgr_image_fb = imread("farBottom.jpg", 1);
 
-	medianBlur(bgr_image,bgr_image,3);
+	medianBlur(bgr_image_ct,bgr_image_ct,3);
+	medianBlur(bgr_image_cb,bgr_image_cb,3);
+	medianBlur(bgr_image_ft,bgr_image_ft,3);
+	medianBlur(bgr_image_fb,bgr_image_fb,3);
 
-	Mat hsv_image;
-	cvtColor(bgr_image,hsv_image,CV_BGR2HSV);
+	Mat hsv_image_ct; cvtColor(bgr_image_ct,hsv_image_ct,CV_BGR2HSV);
+	Mat hsv_image_cb; cvtColor(bgr_image_cb,hsv_image_cb,CV_BGR2HSV);
+	Mat hsv_image_ft; cvtColor(bgr_image_ft,hsv_image_ft,CV_BGR2HSV);
+	Mat hsv_image_fb; cvtColor(bgr_image_fb,hsv_image_fb,CV_BGR2HSV);
 
-	vector<Mat> color_mask_list;
-	color_mask_list = getColorRanges(color_mask_list,hsv_image);
+	vector<Mat> color_mask_list_top;
+	vector<Mat> color_mask_list_bottom; //Need to get hsv values for this
+	color_mask_list_top = getColorRanges(color_mask_list_top,hsv_image_ct);
 
 	string colorString = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
 	int i=0;
 
-	for(i; i < 18; i++){
+	for(i; i < 53; i++){
 
-		//Used to bit mask positions of i that are center pieces --> skip centers
-		static const unsigned center_piece_vals = (1<<0) | (1<<5) | (1<<7) |(1<<14) | (1<<22) | (1<<31);
+		//Vector lists for cube mask index used by each image
+		vector<int> ct{5,7,8,9,10,11,12,15,19,20,23,26};
+		vector<int> cb{18,21,24,25,27,28,29,30,33,41,42,43,44};
+		vector<int> ft{0,1,2,3,6,36,37,38,39,45,46,47,50,53};
+		vector<int> fb{14,16,17,32,34,35,48,51,52};
 
-		//Skips center pieces (values in cube string for center pieces are already set)
-		if((1<<i) & center_piece_vals){ continue; }
-		if( i == 40 || i == 49){ continue; } // other center piece values that dont fit in unsigned bits
+
+		//Center pieces that can be skipped
+		if( i == 4 || i == 13 || i == 22 || i == 31 || i == 40 || i == 49){ continue; }
 
 		//Create string for each mask image to open
 		String cube_mask;
@@ -56,19 +68,43 @@ int main( int argc, char** argv ){
 
 		Mat img_bw;
 		threshold(erode_img, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+		
 		Mat cube_square;
-		bitwise_and(bgr_image,bgr_image,cube_square,img_bw);
 
-		// imshow("Cube Square", cube_square);
-		// waitKey(0);
+		//Figuring out which image to use with the mask
+		//imageSet used to short circuit once image has been found.
+		bool imageSet = true;
+		//Use closeTop.jpg
+		if(imageSet && (find(ct.begin(), ct.end(), i) != ct.end())){
+			imageSet = false;
+			bitwise_and(bgr_image_ct,bgr_image_ct,cube_square,img_bw);
+		}
+		//Use closeBottom.jpg
+		if(imageSet && (find(cb.begin(), cb.end(), i) != cb.end())){
+			imageSet = false;
+			bitwise_and(bgr_image_cb,bgr_image_cb,cube_square,img_bw);
+		}
+		//Use farTop.jpg
+		if(imageSet && (find(ft.begin(), ft.end(), i) != ft.end())){
+			imageSet = false;
+			bitwise_and(bgr_image_ft,bgr_image_ft,cube_square,img_bw);
+		}
+		//Use farBottom.jpg
+		if(imageSet && (find(fb.begin(), fb.end(), i) != fb.end())){
+			imageSet = false;
+			bitwise_and(bgr_image_fb,bgr_image_fb,cube_square,img_bw);
+		}
 
-		colorString = getCubeColor(cube_square, color_mask_list, colorString, i-1);
+		imshow("Cube Square", cube_square);
+		waitKey(0);
+
+		colorString = getCubeColor(cube_square, color_mask_list_top, colorString, i-1);
 
 	}
 
 	cout << colorString << '\n';
 
-	imshow("Image", bgr_image);
+	imshow("Image", bgr_image_ct);
 
 	char key = (char) waitKey(0);
 	if (key == 'q' || key == 27)
@@ -116,14 +152,9 @@ string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string,
 	rcount = getNonZero(red, gR);
 	ocount = getNonZero(orange, gO);
 
-	if (ycount > 100){
+	if (ycount > 200){
 
 		cube_string.replace(position,1,"U");
-
-	}
-	if (wcount > 200){
-
-		cube_string.replace(position,1,"D");
 
 	}	
 	if (bcount > 200){
@@ -144,6 +175,11 @@ string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string,
 	if (ocount > 200){
 
 		cube_string.replace(position,1,"B");
+
+	}
+	if (wcount > 200){
+
+		cube_string.replace(position,1,"D");
 
 	}
 
