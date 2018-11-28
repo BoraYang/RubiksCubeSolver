@@ -17,6 +17,7 @@ vector<Mat> getColorRanges(vector<Mat> color_list, Mat hsv_image);
 
 int main( int argc, char** argv ){
 
+	//Color images for each camera
 	Mat bgr_image_ct; bgr_image_ct = imread("closeTop.jpg", 1);
 	Mat bgr_image_cb; bgr_image_cb = imread("closeBottom.jpg", 1);
 	Mat bgr_image_ft; bgr_image_ft = imread("farTop.jpg", 1);
@@ -42,7 +43,8 @@ int main( int argc, char** argv ){
 
 	for(i; i < 53; i++){
 
-		//Vector lists for cube mask index used by each image
+		//Vector lists for cube masks positioning used by each image
+		//ct -> closeTop, cb -> closeBottom, ft -> farTop, fb -> farBottom
 		vector<int> ct{5,7,8,9,10,11,12,15,19,20,23,26};
 		vector<int> cb{18,21,24,25,27,28,29,30,33,41,42,43,44};
 		vector<int> ft{0,1,2,3,6,36,37,38,39,45,46,47,50,53};
@@ -95,8 +97,8 @@ int main( int argc, char** argv ){
 			bitwise_and(bgr_image_fb,bgr_image_fb,cube_square,img_bw);
 		}
 
-		imshow("Cube Square", cube_square);
-		waitKey(0);
+		// imshow("Cube Square", cube_square);
+		// waitKey(0);
 
 		colorString = getCubeColor(cube_square, color_mask_list_top, colorString, i-1);
 
@@ -132,7 +134,7 @@ int getNonZero(Mat input_array, Mat gray_arr){
 string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string, int position){
 
 	//Yellow: 0, White: 1, Blue: 2, Green: 3, Red: 4, Orange: 5
-  //Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
+  	//Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
 
 	Mat yellow; Mat white; Mat blue; Mat green; Mat red; Mat orange;
 	Mat gY; Mat gW; Mat gB; Mat gG; Mat gR; Mat gO;
