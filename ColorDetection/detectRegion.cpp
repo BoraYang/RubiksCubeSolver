@@ -12,8 +12,8 @@ using namespace std;
 
 //Function declarations
 int getNonZero(Mat input_array, Mat gray_arr);
-string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string, int position);
-vector<Mat> getColorRanges(vector<Mat> color_list, Mat hsv_image);
+void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, int position);
+void getColorRanges(vector<Mat> &color_list, Mat hsv_image);
 
 int main( int argc, char** argv ){
 
@@ -35,7 +35,7 @@ int main( int argc, char** argv ){
 
 	vector<Mat> color_mask_list_top;
 	vector<Mat> color_mask_list_bottom; //Need to get hsv values for this
-	color_mask_list_top = getColorRanges(color_mask_list_top,hsv_image_ct);
+	getColorRanges(color_mask_list_top,hsv_image_ct);
 
 	string colorString = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
@@ -97,10 +97,10 @@ int main( int argc, char** argv ){
 			bitwise_and(bgr_image_fb,bgr_image_fb,cube_square,img_bw);
 		}
 
-		// imshow("Cube Square", cube_square);
-		// waitKey(0);
+		imshow("Cube Square", cube_square);
+		waitKey(0);
 
-		colorString = getCubeColor(cube_square, color_mask_list_top, colorString, i-1);
+		getCubeColor(cube_square, color_mask_list_top, colorString, i-1);
 
 	}
 
@@ -131,7 +131,7 @@ int getNonZero(Mat input_array, Mat gray_arr){
 
 }
 
-string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string, int position){
+void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, int position){
 
 	//Yellow: 0, White: 1, Blue: 2, Green: 3, Red: 4, Orange: 5
   	//Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
@@ -185,8 +185,6 @@ string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string,
 
 	}
 
-	return cube_string;
-
 }
 
 /*
@@ -195,7 +193,7 @@ string getCubeColor(Mat cube_square, vector<Mat> color_list, string cube_string,
 	used to find the color of each cube square mask with a bitwise_and
 	computation.
 */
-vector<Mat> getColorRanges(vector<Mat> masks, Mat hsv_image){
+void getColorRanges(vector<Mat> &masks, Mat hsv_image){
 
 	Mat mask_yellow; Mat mask_white; Mat mask_blue; Mat mask_green; Mat mask_red; Mat mask_orange;
 
@@ -212,7 +210,5 @@ vector<Mat> getColorRanges(vector<Mat> masks, Mat hsv_image){
 	masks.push_back(mask_green);
 	masks.push_back(mask_red);
 	masks.push_back(mask_orange);
-
-	return masks;
 
 }
