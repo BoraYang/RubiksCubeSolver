@@ -43,7 +43,7 @@ int main( int argc, char** argv ){
 
 	for(i; i < 53; i++){
 
-		//Vector lists for cube masks positioning used by each image
+		//Vector which specify what cube mask to use for each image.
 		//ct -> closeTop, cb -> closeBottom, ft -> farTop, fb -> farBottom
 		vector<int> ct{5,7,8,9,10,11,12,15,19,20,23,26};
 		vector<int> cb{18,21,24,25,27,28,29,30,33,41,42,43,44};
@@ -100,7 +100,7 @@ int main( int argc, char** argv ){
 		imshow("Cube Square", cube_square);
 		waitKey(0);
 
-		getCubeColor(cube_square, color_mask_list_top, colorString, i-1);
+		getCubeColor(cube_square, color_mask_list_top, colorString, i);
 
 	}
 
@@ -154,6 +154,10 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, 
 	rcount = getNonZero(red, gR);
 	ocount = getNonZero(orange, gO);
 
+	//printf("%d Y:%d, W:%d, B:%d, G:%d, R:%d, O:%d\n", position, ycount, wcount, bcount, gcount, rcount, ocount);
+
+	imshow("yellow", yellow);
+
 	if (ycount > 200){
 
 		cube_string.replace(position,1,"U");
@@ -197,12 +201,12 @@ void getColorRanges(vector<Mat> &masks, Mat hsv_image){
 
 	Mat mask_yellow; Mat mask_white; Mat mask_blue; Mat mask_green; Mat mask_red; Mat mask_orange;
 
-	inRange(hsv_image,Scalar(26,60,130),Scalar(36,140,190),mask_yellow);
-	inRange(hsv_image,Scalar(0,0,160),Scalar(255,50,255),mask_white);
-	inRange(hsv_image,Scalar(100,150,0),Scalar(140,255,255),mask_blue);
-	inRange(hsv_image,Scalar(50,50,80),Scalar(85,255,255),mask_green);
-	inRange(hsv_image,Scalar(0,170,100),Scalar(10,255,160),mask_red);
-	inRange(hsv_image,Scalar(5,100,200),Scalar(25,199,255),mask_orange);
+	inRange(hsv_image,Scalar(26,40,100),Scalar(40,255,255),mask_yellow);
+	inRange(hsv_image,Scalar(0,0,80),Scalar(255,50,255),mask_white);
+	inRange(hsv_image,Scalar(100,100,0),Scalar(140,255,255),mask_blue);
+	inRange(hsv_image,Scalar(50,50,50),Scalar(85,255,255),mask_green);
+	inRange(hsv_image,Scalar(0,140,20),Scalar(10,240,255),mask_red);
+	inRange(hsv_image,Scalar(5,50,50),Scalar(25,255,255),mask_orange);
 
 	masks.push_back(mask_yellow);
 	masks.push_back(mask_white);

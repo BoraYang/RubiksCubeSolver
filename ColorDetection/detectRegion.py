@@ -8,24 +8,24 @@ import cv2
 import numpy as np
 
 
-def getColorRanges(color_list):
+def getColorRanges(hsvImage, color_list):
 
-  mask_yellow = cv2.inRange(hsv_image,(26,60,130),(36,140,190))
+  mask_yellow = cv2.inRange(hsvImage,(26,60,130),(36,140,190))
   color_mask_list.append(mask_yellow)
 
-  mask_white = cv2.inRange(hsv_image,(0,0,160),(255,50,255))
+  mask_white = cv2.inRange(hsvImage,(0,0,160),(255,50,255))
   color_mask_list.append(mask_white)
 
-  mask_blue = cv2.inRange(hsv_image,(100,150,0),(140,255,255))
+  mask_blue = cv2.inRange(hsvImage,(100,120,0),(140,255,255))
   color_mask_list.append(mask_blue)
 
-  mask_green = cv2.inRange(hsv_image,(50,50,80),(85,255,255))
+  mask_green = cv2.inRange(hsvImage,(50,50,80),(85,255,255))
   color_mask_list.append(mask_green)
 
-  mask_red = cv2.inRange(hsv_image,(0,170,100),(10,255,160))
+  mask_red = cv2.inRange(hsvImage,(0,170,100),(10,255,160))
   color_mask_list.append(mask_red)
 
-  mask_orange = cv2.inRange(hsv_image,(5,100,200),(25,199,255))
+  mask_orange = cv2.inRange(hsvImage,(5,100,200),(25,199,255))
   color_mask_list.append(mask_orange)
 
 def getCubeColor(cube_square, color_array, cube_string, position):
@@ -33,6 +33,9 @@ def getCubeColor(cube_square, color_array, cube_string, position):
 
   #Yellow: 0, White: 1, Blue: 2, Green: 3, Red: 4, Orange: 5
   #Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
+
+  cv2.imshow("CS",cube_square)
+  cv2.waitKey(0)
 
   #Determine if cube square is of a certain color. If it is a certain color, the value stored in the variable will be greater than zero.
   yellow = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[0]))
@@ -45,22 +48,22 @@ def getCubeColor(cube_square, color_array, cube_string, position):
   print(f"Y:{yellow},W:{white},B:{blue},G:{green},R:{red},O:{orange}")
 
   if yellow > 100:
-    cube_string[position-1] = 'U'
+    cube_string[position] = 'U'
     return
   if white > 100:
-    cube_string[position-1] = 'D'
+    cube_string[position] = 'D'
     return
   if blue > 100:
-    cube_string[position-1] = 'L'
+    cube_string[position] = 'L'
     return
   if green > 100:
-    cube_string[position-1] = 'R'
+    cube_string[position] = 'R'
     return
   if red > 100:
-    cube_string[position-1] = 'F'
+    cube_string[position] = 'F'
     return
   if orange > 100:
-    cube_string[position-1] = 'B'
+    cube_string[position] = 'B'
     return
 
 def maskImagePreprocess(inputImage,mask):
@@ -70,27 +73,46 @@ def maskImagePreprocess(inputImage,mask):
 
   return mask_apply
 
-bgr_image = cv2.imread("closeTop.jpg") #[0:280,120:470]
+bgr_image_ct = cv2.imread("closeTop.jpg")
+bgr_image_cb = cv2.imread("closeBottom.jpg")
+bgr_image_ft = cv2.imread("farTop.jpg")
+bgr_image_fb = cv2.imread("farBottom.jpg")
 
-cv2.medianBlur(bgr_image,3)
+# cv2.medianBlur(bgr_image_ct,3)
+# cv2.medianBlur(bgr_image_cb,3)
+# cv2.medianBlur(bgr_image_ft,3)
+# cv2.medianBlur(bgr_image_fb,3)
 
-hsv_image = cv2.cvtColor(bgr_image,cv2.COLOR_BGR2HSV)
+
+hsv_image = cv2.cvtColor(bgr_image_ct,cv2.COLOR_BGR2HSV)
 
 color_mask_list = []
 #Yellow: 0, White: 1, Blue: 2, Green: 3, Red: 4, Orange: 5
-getColorRanges(color_mask_list)
+getColorRanges(hsv_image, color_mask_list)
 
 colorString = list("U"*9) + list("R"*9) + list("F"*9) + list("D"*9) + list("L"*9) + list("B"*9)
 
 
 #Mask loop
-for i in range(1,18):
+for i in range(54):
 
-  if i in [5,7,14]:
+  if i in [4,13,22,31,40,49]:
     continue
 
+  if i in [5,7,8,9,10,11,12,15,19,20,23,26]:
+    bgr_image = bgr_image_ct
+
+  if i in [18,21,24,25,27,28,29,30,33,41,42,43,44]:
+    bgr_image = bgr_image_cb
+
+  if i in [0,1,2,3,6,36,37,38,39,45,46,47,50,53]:
+    bgr_image = bgr_image_ft
+
+  if i in [14,16,17,32,34,35,48,51,52]:
+    bgr_image = bgr_image_fb
+
   #Formats a filename string for the mask in order. Skips mask #'s that cannot be seen by the current image, or are a center piece
-  cube_mask = f"mask{str(i)}.jpg" 
+  cube_mask = f"mask{str(i)}.jpg"
 
   #Convert cube square to black/white image for erode scaling
   bw_square = cv2.imread(cube_mask, cv2.IMREAD_GRAYSCALE)
@@ -101,9 +123,6 @@ for i in range(1,18):
   cube_square = maskImagePreprocess(bgr_image,erode)
 
   getCubeColor(cube_square,color_mask_list,colorString,i)
-
-  #Assign this function call to a 'square_color' variable that will assign a color to each position in the output string
-  #getCenterOfCube(hsv_image,cube_square)
 
 finalCubeString = "".join(colorString)
 print(finalCubeString)
