@@ -1,3 +1,7 @@
+//TODO: Create masks for new images
+//Fix red/orange color values and fix bottom color thresholds
+// a little bit to better detect.
+
 #include <opencv2/core/core.hpp>
 #include "opencv2/imgproc.hpp"
 #include <opencv2/imgcodecs.hpp>
@@ -13,7 +17,8 @@ using namespace std;
 //Function declarations
 int getNonZero(Mat input_array, Mat gray_arr);
 void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, int position);
-void getColorRanges(vector<Mat> &color_list, Mat hsv_image);
+void setupLowMask(vector<Mat> &color_list, Mat hsv_image);
+void setupHighMask(vector<Mat> &color_list, Mat hsv_image);
 
 int main( int argc, char** argv ){
 
@@ -33,30 +38,24 @@ int main( int argc, char** argv ){
 	Mat hsv_image_ft; cvtColor(bgr_image_ft,hsv_image_ft,CV_BGR2HSV);
 	Mat hsv_image_fb; cvtColor(bgr_image_fb,hsv_image_fb,CV_BGR2HSV);
 
-	vector<Mat> color_mask_list_top;
-	vector<Mat> color_mask_list_bottom; //Need to get hsv values for this
-	getColorRanges(color_mask_list_top,hsv_image_ct);
+	vector<Mat> mask_list_ct; setupHighMask(mask_list_ct, hsv_image_ct);
+	vector<Mat> mask_list_cb; setupLowMask(mask_list_cb, hsv_image_cb);
+	vector<Mat> mask_list_ft; setupHighMask(mask_list_ft, hsv_image_ft);
+	vector<Mat> mask_list_fb; setupLowMask(mask_list_fb, hsv_image_fb);
 
 	string colorString = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
+	vector<int> ct{5,7,8,9,10,11,12,15,19,20,23,26};
+	vector<int> cb{18,21,24,25,27,28,29,30,33,41,42,43,44};
+	vector<int> ft{0,1,2,3,6,36,37,38,39,45,46,47,50,53};
+	vector<int> fb{14,16,17,32,34,35,48,51,52};
+
 	int i=0;
 
-	for(i; i < 53; i++){
+	for(i; i < ct.size(); i++){
 
-		//Vector which specify what cube mask to use for each image.
-		//ct -> closeTop, cb -> closeBottom, ft -> farTop, fb -> farBottom
-		vector<int> ct{5,7,8,9,10,11,12,15,19,20,23,26};
-		vector<int> cb{18,21,24,25,27,28,29,30,33,41,42,43,44};
-		vector<int> ft{0,1,2,3,6,36,37,38,39,45,46,47,50,53};
-		vector<int> fb{14,16,17,32,34,35,48,51,52};
-
-
-		//Center pieces that can be skipped
-		if( i == 4 || i == 13 || i == 22 || i == 31 || i == 40 || i == 49){ continue; }
-
-		//Create string for each mask image to open
-		String cube_mask;
-		cube_mask = "mask" + to_string(i) + ".jpg";
+		string cube_mask;
+		cube_mask = "mask" + to_string(ct.at(i)) + ".jpg";
 
 		//Reading in the cube square mask in black and white mode
 		Mat bw_square;
@@ -72,35 +71,98 @@ int main( int argc, char** argv ){
 		threshold(erode_img, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
 		
 		Mat cube_square;
+		bitwise_and(bgr_image_ct,bgr_image_ct,cube_square,img_bw);
 
-		//Figuring out which image to use with the mask
-		//imageSet used to short circuit once image has been found.
-		bool imageSet = true;
-		//Use closeTop.jpg
-		if(imageSet && (find(ct.begin(), ct.end(), i) != ct.end())){
-			imageSet = false;
-			bitwise_and(bgr_image_ct,bgr_image_ct,cube_square,img_bw);
-		}
-		//Use closeBottom.jpg
-		if(imageSet && (find(cb.begin(), cb.end(), i) != cb.end())){
-			imageSet = false;
-			bitwise_and(bgr_image_cb,bgr_image_cb,cube_square,img_bw);
-		}
-		//Use farTop.jpg
-		if(imageSet && (find(ft.begin(), ft.end(), i) != ft.end())){
-			imageSet = false;
-			bitwise_and(bgr_image_ft,bgr_image_ft,cube_square,img_bw);
-		}
-		//Use farBottom.jpg
-		if(imageSet && (find(fb.begin(), fb.end(), i) != fb.end())){
-			imageSet = false;
-			bitwise_and(bgr_image_fb,bgr_image_fb,cube_square,img_bw);
-		}
+		getCubeColor(cube_square, mask_list_ct, colorString, ct.at(i));
 
-		imshow("Cube Square", cube_square);
+		imshow("cube", cube_square);
+		waitKey(0);
+	}
+
+	i=0;
+	for(i; i < cb.size(); i++){
+
+		string cube_mask;
+		cube_mask = "mask" + to_string(cb.at(i)) + ".jpg";
+
+		//Reading in the cube square mask in black and white mode
+		Mat bw_square;
+		bw_square = imread(cube_mask, 0);
+
+		//Eroding cube square mask to cut out black/white noise on the edge of image
+		Mat erode_img;
+		Mat element;
+		element = getStructuringElement(MORPH_ELLIPSE,Size(9,9),Point(4,4));
+		erode(bw_square,erode_img,element);
+
+		Mat img_bw;
+		threshold(erode_img, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+		
+		Mat cube_square;
+		bitwise_and(bgr_image_cb,bgr_image_cb,cube_square,img_bw);
+
+		getCubeColor(cube_square, mask_list_cb, colorString, cb.at(i));
+
+		imshow("cube", cube_square);
 		waitKey(0);
 
-		getCubeColor(cube_square, color_mask_list_top, colorString, i);
+	}
+
+	i=0;
+	for(i; i < ft.size(); i++){
+
+		string cube_mask;
+		cube_mask = "mask" + to_string(ft.at(i)) + ".jpg";
+
+		//Reading in the cube square mask in black and white mode
+		Mat bw_square;
+		bw_square = imread(cube_mask, 0);
+
+		//Eroding cube square mask to cut out black/white noise on the edge of image
+		Mat erode_img;
+		Mat element;
+		element = getStructuringElement(MORPH_ELLIPSE,Size(9,9),Point(4,4));
+		erode(bw_square,erode_img,element);
+
+		Mat img_bw;
+		threshold(erode_img, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+		
+		Mat cube_square;
+		bitwise_and(bgr_image_ft,bgr_image_ft,cube_square,img_bw);
+
+		getCubeColor(cube_square, mask_list_ft, colorString, ft.at(i));
+
+		imshow("cube", cube_square);
+		waitKey(0);
+
+	}
+
+	i=0;
+	for(i; i < fb.size(); i++){
+
+		string cube_mask;
+		cube_mask = "mask" + to_string(fb.at(i)) + ".jpg";
+
+		//Reading in the cube square mask in black and white mode
+		Mat bw_square;
+		bw_square = imread(cube_mask, 0);
+
+		//Eroding cube square mask to cut out black/white noise on the edge of image
+		Mat erode_img;
+		Mat element;
+		element = getStructuringElement(MORPH_ELLIPSE,Size(9,9),Point(4,4));
+		erode(bw_square,erode_img,element);
+
+		Mat img_bw;
+		threshold(erode_img, img_bw, 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+		
+		Mat cube_square;
+		bitwise_and(bgr_image_fb,bgr_image_fb,cube_square,img_bw);
+
+		getCubeColor(cube_square, mask_list_fb, colorString, fb.at(i));
+
+		imshow("cube", cube_square);
+		waitKey(0);
 
 	}
 
@@ -154,9 +216,7 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, 
 	rcount = getNonZero(red, gR);
 	ocount = getNonZero(orange, gO);
 
-	//printf("%d Y:%d, W:%d, B:%d, G:%d, R:%d, O:%d\n", position, ycount, wcount, bcount, gcount, rcount, ocount);
-
-	imshow("yellow", yellow);
+	printf("%d Y:%d, W:%d, B:%d, G:%d, R:%d, O:%d\n", position, ycount, wcount, bcount, gcount, rcount, ocount);
 
 	if (ycount > 200){
 
@@ -197,7 +257,27 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, 
 	used to find the color of each cube square mask with a bitwise_and
 	computation.
 */
-void getColorRanges(vector<Mat> &masks, Mat hsv_image){
+void setupHighMask(vector<Mat> &masks, Mat hsv_image){
+
+	Mat mask_yellow; Mat mask_white; Mat mask_blue; Mat mask_green; Mat mask_red; Mat mask_orange;
+
+	inRange(hsv_image,Scalar(26,40,55),Scalar(40,255,255),mask_yellow);
+	inRange(hsv_image,Scalar(0,0,0),Scalar(255,50,255),mask_white);
+	inRange(hsv_image,Scalar(100,100,0),Scalar(140,255,255),mask_blue);
+	inRange(hsv_image,Scalar(50,50,0),Scalar(85,255,255),mask_green);
+	inRange(hsv_image,Scalar(0,50,0),Scalar(10,255,255),mask_red);
+	inRange(hsv_image,Scalar(5,50,50),Scalar(25,255,255),mask_orange);
+
+	masks.push_back(mask_yellow);
+	masks.push_back(mask_white);
+	masks.push_back(mask_blue);
+	masks.push_back(mask_green);
+	masks.push_back(mask_red);
+	masks.push_back(mask_orange);
+
+}
+
+void setupLowMask(vector<Mat> &masks, Mat hsv_image){
 
 	Mat mask_yellow; Mat mask_white; Mat mask_blue; Mat mask_green; Mat mask_red; Mat mask_orange;
 
