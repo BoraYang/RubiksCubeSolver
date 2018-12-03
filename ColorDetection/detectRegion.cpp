@@ -1,5 +1,4 @@
-//TODO: Create masks for new images
-//Fix red/orange color values and fix bottom color thresholds
+//TODO: Fix red/orange color values and fix bottom color thresholds
 // a little bit to better detect.
 
 #include <opencv2/core/core.hpp>
@@ -45,6 +44,7 @@ int main( int argc, char** argv ){
 
 	string colorString = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
 
+	//Masks per image
 	vector<int> ct{5,7,8,9,10,11,12,15,19,20,23,26};
 	vector<int> cb{18,21,24,25,27,28,29,30,33,41,42,43,44};
 	vector<int> ft{0,1,2,3,6,36,37,38,39,45,46,47,50,53};
@@ -168,14 +168,6 @@ int main( int argc, char** argv ){
 
 	cout << colorString << '\n';
 
-	imshow("Image", bgr_image_ct);
-
-	char key = (char) waitKey(0);
-	if (key == 'q' || key == 27)
-	{
-	  exit(0);
-	}
-
 	return 0;
 
 }
@@ -215,38 +207,39 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, 
 	gcount = getNonZero(green, gG);
 	rcount = getNonZero(red, gR);
 	ocount = getNonZero(orange, gO);
+	int diff = rcount - ocount;
 
 	printf("%d Y:%d, W:%d, B:%d, G:%d, R:%d, O:%d\n", position, ycount, wcount, bcount, gcount, rcount, ocount);
 
-	if (ycount > 200){
+	if (ycount > 400){
 
 		cube_string.replace(position,1,"U");
-
+		return;
 	}	
-	if (bcount > 200){
+	if (bcount > 400){
 
 		cube_string.replace(position,1,"L");
-
+		return;
 	}
-	if (gcount > 200){
+	if (gcount > 400){
 
 		cube_string.replace(position,1,"R");
-
+		return;
 	}
-	if (rcount > 200){
-
-		cube_string.replace(position,1,"F");
-
-	}
-	if (ocount > 200){
-
-		cube_string.replace(position,1,"B");
-
-	}
-	if (wcount > 200){
+	if (wcount > 400){
 
 		cube_string.replace(position,1,"D");
+		return;
+	}
+	if (diff > 60){
 
+		cube_string.replace(position,1,"F");
+		return;
+	}
+	else{
+
+		cube_string.replace(position,1,"B");
+		return;
 	}
 
 }
@@ -282,9 +275,9 @@ void setupLowMask(vector<Mat> &masks, Mat hsv_image){
 	Mat mask_yellow; Mat mask_white; Mat mask_blue; Mat mask_green; Mat mask_red; Mat mask_orange;
 
 	inRange(hsv_image,Scalar(26,40,100),Scalar(40,255,255),mask_yellow);
-	inRange(hsv_image,Scalar(0,0,80),Scalar(255,50,255),mask_white);
+	inRange(hsv_image,Scalar(0,0,0),Scalar(255,90,255),mask_white);
 	inRange(hsv_image,Scalar(100,100,0),Scalar(140,255,255),mask_blue);
-	inRange(hsv_image,Scalar(50,50,50),Scalar(85,255,255),mask_green);
+	inRange(hsv_image,Scalar(41,50,35),Scalar(85,255,255),mask_green);
 	inRange(hsv_image,Scalar(0,140,20),Scalar(10,240,255),mask_red);
 	inRange(hsv_image,Scalar(5,50,50),Scalar(25,255,255),mask_orange);
 
