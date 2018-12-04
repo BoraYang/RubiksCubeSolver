@@ -7,6 +7,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <algorithm>
 
@@ -14,6 +15,7 @@ using namespace cv;
 using namespace std;
 
 //Function declarations
+void getImageFromCamera(Mat &bgr_input, int cameraIndex);
 int getNonZero(Mat input_array, Mat gray_arr);
 void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, int position);
 void setupLowMask(vector<Mat> &color_list, Mat hsv_image);
@@ -22,10 +24,15 @@ void setupHighMask(vector<Mat> &color_list, Mat hsv_image);
 int main( int argc, char** argv ){
 
 	//Color images for each camera
-	Mat bgr_image_ct; bgr_image_ct = imread("closeTop.jpg", 1);
-	Mat bgr_image_cb; bgr_image_cb = imread("closeBottom.jpg", 1);
-	Mat bgr_image_ft; bgr_image_ft = imread("farTop.jpg", 1);
-	Mat bgr_image_fb; bgr_image_fb = imread("farBottom.jpg", 1);
+	// Mat bgr_image_ct; bgr_image_ct = imread("closeTop.jpg", 1);
+	// Mat bgr_image_cb; bgr_image_cb = imread("closeBottom.jpg", 1);
+	// Mat bgr_image_ft; bgr_image_ft = imread("farTop.jpg", 1);
+	// Mat bgr_image_fb; bgr_image_fb = imread("farBottom.jpg", 1);
+
+	Mat bgr_image_ct; getImageFromCamera(bgr_image_ct, 3);
+	Mat bgr_image_cb; getImageFromCamera(bgr_image_cb, 2);
+	Mat bgr_image_ft; getImageFromCamera(bgr_image_ft, 1);
+	Mat bgr_image_fb; getImageFromCamera(bgr_image_fb, 0);
 
 	medianBlur(bgr_image_ct,bgr_image_ct,3);
 	medianBlur(bgr_image_cb,bgr_image_cb,3);
@@ -64,7 +71,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(9,9),Point(4,4));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(20,20),Point(8,8));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -92,7 +99,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(9,9),Point(4,4));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(20,20),Point(8,8));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -121,7 +128,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(9,9),Point(4,4));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(20,20),Point(8,8));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -150,7 +157,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(9,9),Point(4,4));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(20,20),Point(8,8));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -166,9 +173,28 @@ int main( int argc, char** argv ){
 
 	}
 
-	cout << colorString << '\n';
+	ofstream myFile;
+	const char *path = "/home/reed/RubiksCubeSolver/solution.txt";
+	myFile.open(path);
+
+	myFile << colorString;
+
+	myFile.close();
 
 	return 0;
+
+}
+
+void getImageFromCamera(Mat &bgr_input, int cameraIndex){
+
+	VideoCapture cap(cameraIndex);
+
+	if(!cap.isOpened()){
+		cout << "Camera " << cameraIndex << " cannot be opened. Please check that it is connected properly.";
+		exit(1);
+	}
+
+	cap >> bgr_input;
 
 }
 

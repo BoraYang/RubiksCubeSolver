@@ -1,9 +1,0 @@
-look at normalization and equalization for pre-processing of image
-
-fiducial
-
-least squares error - color detection
-
-get individual square mask -> erode by 5 pixels to get rid of black/white border -> get average color value
-
-in gimp draw over rubiks cube image and make a mask to use
