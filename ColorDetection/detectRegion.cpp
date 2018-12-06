@@ -1,6 +1,3 @@
-//TODO: Fix red/orange color values and fix bottom color thresholds
-// a little bit to better detect.
-
 #include <opencv2/core/core.hpp>
 #include "opencv2/imgproc.hpp"
 #include <opencv2/imgcodecs.hpp>
@@ -23,11 +20,11 @@ void setupHighMask(vector<Mat> &color_list, Mat hsv_image);
 
 int main( int argc, char** argv ){
 
-	//Color images for each camera
-	// Mat bgr_image_ct; bgr_image_ct = imread("closeTop.jpg", 1);
-	// Mat bgr_image_cb; bgr_image_cb = imread("closeBottom.jpg", 1);
-	// Mat bgr_image_ft; bgr_image_ft = imread("farTop.jpg", 1);
-	// Mat bgr_image_fb; bgr_image_fb = imread("farBottom.jpg", 1);
+	//Camera Names
+	//ct -> closeTop
+	//cb -> closeBottom
+	//ft -> farTop
+	//fb -> farBottom
 
 	Mat bgr_image_ct; getImageFromCamera(bgr_image_ct, 1);
 	Mat bgr_image_cb; getImageFromCamera(bgr_image_cb, 2);
@@ -71,7 +68,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(12,12),Point(4,4));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(7,7),Point(3,3));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -99,7 +96,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(12,12),Point(4,4));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(7,7),Point(3,3));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -128,7 +125,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(12,12),Point(4,4));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(7,7),Point(3,3));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -157,7 +154,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(12,12),Point(4,4));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(7,7),Point(3,3));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
