@@ -29,9 +29,9 @@ int main( int argc, char** argv ){
 	// Mat bgr_image_ft; bgr_image_ft = imread("farTop.jpg", 1);
 	// Mat bgr_image_fb; bgr_image_fb = imread("farBottom.jpg", 1);
 
-	Mat bgr_image_ct; getImageFromCamera(bgr_image_ct, 3);
+	Mat bgr_image_ct; getImageFromCamera(bgr_image_ct, 1);
 	Mat bgr_image_cb; getImageFromCamera(bgr_image_cb, 2);
-	Mat bgr_image_ft; getImageFromCamera(bgr_image_ft, 1);
+	Mat bgr_image_ft; getImageFromCamera(bgr_image_ft, 3);
 	Mat bgr_image_fb; getImageFromCamera(bgr_image_fb, 0);
 
 	medianBlur(bgr_image_ct,bgr_image_ct,3);
@@ -71,7 +71,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(20,20),Point(8,8));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(12,12),Point(4,4));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -82,8 +82,8 @@ int main( int argc, char** argv ){
 
 		getCubeColor(cube_square, mask_list_ct, colorString, ct.at(i));
 
-		imshow("cube", cube_square);
-		waitKey(0);
+		// imshow("cube", cube_square);
+		// waitKey(0);
 	}
 
 	i=0;
@@ -99,7 +99,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(20,20),Point(8,8));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(12,12),Point(4,4));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -110,8 +110,8 @@ int main( int argc, char** argv ){
 
 		getCubeColor(cube_square, mask_list_cb, colorString, cb.at(i));
 
-		imshow("cube", cube_square);
-		waitKey(0);
+		// imshow("cube", cube_square);
+		// waitKey(0);
 
 	}
 
@@ -128,7 +128,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(20,20),Point(8,8));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(12,12),Point(4,4));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -139,8 +139,8 @@ int main( int argc, char** argv ){
 
 		getCubeColor(cube_square, mask_list_ft, colorString, ft.at(i));
 
-		imshow("cube", cube_square);
-		waitKey(0);
+		// imshow("cube", cube_square);
+		// waitKey(0);
 
 	}
 
@@ -157,7 +157,7 @@ int main( int argc, char** argv ){
 		//Eroding cube square mask to cut out black/white noise on the edge of image
 		Mat erode_img;
 		Mat element;
-		element = getStructuringElement(MORPH_ELLIPSE,Size(20,20),Point(8,8));
+		element = getStructuringElement(MORPH_ELLIPSE,Size(12,12),Point(4,4));
 		erode(bw_square,erode_img,element);
 
 		Mat img_bw;
@@ -168,8 +168,8 @@ int main( int argc, char** argv ){
 
 		getCubeColor(cube_square, mask_list_fb, colorString, fb.at(i));
 
-		imshow("cube", cube_square);
-		waitKey(0);
+		// imshow("cube", cube_square);
+		// waitKey(0);
 
 	}
 
@@ -235,24 +235,24 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, 
 	ocount = getNonZero(orange, gO);
 	int diff = rcount - ocount;
 
-	printf("%d Y:%d, W:%d, B:%d, G:%d, R:%d, O:%d\n", position, ycount, wcount, bcount, gcount, rcount, ocount);
+	//printf("%d Y:%d, W:%d, B:%d, G:%d, R:%d, O:%d\n", position, ycount, wcount, bcount, gcount, rcount, ocount);
 
-	if (ycount > 400){
+	if (ycount > 300){
 
 		cube_string.replace(position,1,"U");
 		return;
 	}	
-	if (bcount > 400){
+	if (bcount > 300){
 
 		cube_string.replace(position,1,"L");
 		return;
 	}
-	if (gcount > 400){
+	if (gcount > 300){
 
 		cube_string.replace(position,1,"R");
 		return;
 	}
-	if (wcount > 400){
+	if (wcount > 300){
 
 		cube_string.replace(position,1,"D");
 		return;
@@ -299,12 +299,15 @@ void setupHighMask(vector<Mat> &masks, Mat hsv_image){
 void setupLowMask(vector<Mat> &masks, Mat hsv_image){
 
 	Mat mask_yellow; Mat mask_white; Mat mask_blue; Mat mask_green; Mat mask_red; Mat mask_orange;
+	Mat mask_red_low; Mat mask_red_hi;
 
 	inRange(hsv_image,Scalar(26,40,100),Scalar(40,255,255),mask_yellow);
 	inRange(hsv_image,Scalar(0,0,0),Scalar(255,90,255),mask_white);
 	inRange(hsv_image,Scalar(100,100,0),Scalar(140,255,255),mask_blue);
 	inRange(hsv_image,Scalar(41,50,35),Scalar(85,255,255),mask_green);
-	inRange(hsv_image,Scalar(0,140,20),Scalar(10,240,255),mask_red);
+	inRange(hsv_image,Scalar(0,140,20),Scalar(10,240,255),mask_red_low);
+	inRange(hsv_image,Scalar(160,140,20),Scalar(180,240,255),mask_red_hi);
+	bitwise_or(mask_red_low, mask_red_hi, mask_red);
 	inRange(hsv_image,Scalar(5,50,50),Scalar(25,255,255),mask_orange);
 
 	masks.push_back(mask_yellow);
