@@ -1,9 +1,3 @@
-#TODO: Once the actual cube images are taken from each camera(1,2,3,4), the mask values (all 48 (54-6 for center pieces))
-#will need to be generated in GIMP. Certain masks will use different images, so when creating the masks, make note of which image they
-#correspond to. In the 'mask loop' (marked mask loop below towards the bottom) have a check with an array (e.g. i (mask index) in [1,2,3])
-#for the masks that correspond to which camera's image will be used in the getCubeColor function. Will possibly need to have a light/dark
-#color range for images (top/bottom are different and will need different color ranges if we dont use lights)
-
 import cv2
 import numpy as np
 
@@ -29,7 +23,6 @@ def getColorRanges(hsvImage, color_list):
   color_mask_list.append(mask_orange)
 
 def getCubeColor(cube_square, color_array, cube_string, position):
-  #Position needs to be decremented by 1 to match cube_string index. Or change "mask.jpg" to start from 0.
 
   #Yellow: 0, White: 1, Blue: 2, Green: 3, Red: 4, Orange: 5
   #Yellow: U, White: D, Blue: L, Green: R, Red: F, Orange: B
@@ -37,7 +30,10 @@ def getCubeColor(cube_square, color_array, cube_string, position):
   cv2.imshow("CS",cube_square)
   cv2.waitKey(0)
 
-  #Determine if cube square is of a certain color. If it is a certain color, the value stored in the variable will be greater than zero.
+  """
+  Determine if cube square is of a certain color.
+  If it is a certain color, the value stored in the variable will be greater than zero. """
+  
   yellow = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[0]))
   white = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[1]))
   blue = np.count_nonzero(cv2.bitwise_and(cube_square,cube_square,mask=color_array[2]))
@@ -77,11 +73,6 @@ bgr_image_ct = cv2.imread("closeTop.jpg")
 bgr_image_cb = cv2.imread("closeBottom.jpg")
 bgr_image_ft = cv2.imread("farTop.jpg")
 bgr_image_fb = cv2.imread("farBottom.jpg")
-
-# cv2.medianBlur(bgr_image_ct,3)
-# cv2.medianBlur(bgr_image_cb,3)
-# cv2.medianBlur(bgr_image_ft,3)
-# cv2.medianBlur(bgr_image_fb,3)
 
 
 hsv_image = cv2.cvtColor(bgr_image_ct,cv2.COLOR_BGR2HSV)
