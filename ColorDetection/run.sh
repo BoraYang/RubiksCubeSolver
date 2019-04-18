@@ -1,1 +1,1 @@
-./detectRegion && cd .. && python3 Motor_code_python.py
+./detectRegion && python3 ../Motor_code_python.py
