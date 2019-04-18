@@ -78,9 +78,6 @@ int main( int argc, char** argv ){
 		bitwise_and(bgr_image_ct,bgr_image_ct,cube_square,img_bw);
 
 		getCubeColor(cube_square, mask_list_ct, colorString, ct.at(i));
-
-		// imshow("cube", cube_square);
-		// waitKey(0);
 	}
 
 	i=0;
@@ -106,10 +103,6 @@ int main( int argc, char** argv ){
 		bitwise_and(bgr_image_cb,bgr_image_cb,cube_square,img_bw);
 
 		getCubeColor(cube_square, mask_list_cb, colorString, cb.at(i));
-
-		// imshow("cube", cube_square);
-		// waitKey(0);
-
 	}
 
 	i=0;
@@ -135,10 +128,6 @@ int main( int argc, char** argv ){
 		bitwise_and(bgr_image_ft,bgr_image_ft,cube_square,img_bw);
 
 		getCubeColor(cube_square, mask_list_ft, colorString, ft.at(i));
-
-		// imshow("cube", cube_square);
-		// waitKey(0);
-
 	}
 
 	i=0;
@@ -164,10 +153,6 @@ int main( int argc, char** argv ){
 		bitwise_and(bgr_image_fb,bgr_image_fb,cube_square,img_bw);
 
 		getCubeColor(cube_square, mask_list_fb, colorString, fb.at(i));
-
-		// imshow("cube", cube_square);
-		// waitKey(0);
-
 	}
 
 	ofstream myFile;
@@ -195,6 +180,13 @@ void getImageFromCamera(Mat &bgr_input, int cameraIndex){
 
 }
 
+
+/*
+	getNonZero returns the number of non zero elements
+	in an image array. Used primarily to determine if
+	a cube square is of a certain color according to a
+	specific mask that it was combined with.
+*/
 int getNonZero(Mat input_array, Mat gray_arr){
 
 	int retVal;
@@ -232,8 +224,6 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, 
 	ocount = getNonZero(orange, gO);
 	int diff = rcount - ocount;
 
-	//printf("%d Y:%d, W:%d, B:%d, G:%d, R:%d, O:%d\n", position, ycount, wcount, bcount, gcount, rcount, ocount);
-
 	if (ycount > 300){
 
 		cube_string.replace(position,1,"U");
@@ -268,10 +258,9 @@ void getCubeColor(Mat cube_square, vector<Mat> color_list, string &cube_string, 
 }
 
 /*
-	getColorRanges: Sets up the input vector<Mat> color_list with masks
-	that represent each color of the cube face. These values will later be
-	used to find the color of each cube square mask with a bitwise_and
-	computation.
+	setupHighMask creates a vector of color masks that will be used for
+	"up" cameras. These cameras typically will view cube faces that have
+	higher lightness values than their darker lower counterparts.
 */
 void setupHighMask(vector<Mat> &masks, Mat hsv_image){
 
@@ -292,7 +281,13 @@ void setupHighMask(vector<Mat> &masks, Mat hsv_image){
 	masks.push_back(mask_orange);
 
 }
+/*
 
+	setLowMask creates a vector of color masks that will be used for
+	"down" cameras. These cameras will have lower lightness values and
+	this function adjusts for that.
+
+*/
 void setupLowMask(vector<Mat> &masks, Mat hsv_image){
 
 	Mat mask_yellow; Mat mask_white; Mat mask_blue; Mat mask_green; Mat mask_red; Mat mask_orange;
